@@ -8,7 +8,7 @@ import {getRedisInstance} from "./redis.js";
 export const cacheData = async ({key, value, exp})=>{
     const cacheInstance = getRedisInstance();
     if(exp){
-        await cacheInstance.setEx(key,exp = 480, value)
+        await cacheInstance.setEx(key,exp, value)
         return;
     }
 

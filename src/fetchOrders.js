@@ -19,8 +19,11 @@ export default async function fetchNewOrders() {
       new Date().getTime() - 120 * 1000
     ).toISOString();
 
+    // console.log("From", twoMinutesAgo);
+    // console.log("To", currentTime);
+
     const establishmentId = process.env.ESTABLISHMENT_ID;
-    const URL = `${BASE_URL}/resources/Order/?establishmentId=${establishmentId}&created_date__range=${twoMinutesAgo},${currentTime}`;
+    const URL = `${BASE_URL}/resources/Order/?establishmentId=${establishmentId}&limit=50&created_date__range=${twoMinutesAgo},${currentTime}`;
 
     const response = await axios.get(URL, {
       headers: {
@@ -29,28 +32,42 @@ export default async function fetchNewOrders() {
       },
     });
 
-    let polledIds = response.data?.objects.map((order) => order.id);
-    console.log("Response Data ids:", polledIds);
+    // filter for only specified PosStation id
+    let polledIds = response.data?.objects.filter(
+      (item) => item.created_at === "/resources/PosStation/516/"
+    );
+
+    // Maps only ids of the orders
+    polledIds = polledIds.map((order) => order.id);
+
+    // console.log("Cache Data==",await getCacheData("savedOrderId"))
 
     if (processedIds.length < 1) {
       await fetchOrderItems(polledIds);
+      /**
+       * cache the ids of orders fetched
+       */
       await cacheData({
         key: "savedOrderId",
         value: JSON.stringify(polledIds),
       });
     } else {
-      // 1,2,3
-      const filteredIds = polledIds.filter((item) => !processedIds.includes(item));
-      //   console.log("Checking filtered ids==========", ids);
-        
-      if(filteredIds < 1) {
-            return;
-        }
-        processedIds = await cacheData({
-            key: "savedOrderId",
-            value: JSON.stringify(polledIds),
-        });
-        await fetchOrderItems(filteredIds);
+      /**
+       * Remove previously fetch & processed Order Id from the new order poll
+       */
+      const filteredIds = polledIds.filter(
+        (item) => !processedIds.includes(item)
+      );
+
+      if (filteredIds < 1) return;
+      /**
+       * cache the ids of orders fetched
+       */
+      processedIds = await cacheData({
+        key: "savedOrderId",
+        value: JSON.stringify(polledIds),
+      });
+      await fetchOrderItems(filteredIds);
     }
 
     // console.log("Checking cache==========",await getCacheData("savedOrderId"))

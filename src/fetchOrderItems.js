@@ -12,6 +12,10 @@ export default async function fetchOrderItems(orderIds = []) {
         if (orderIds.length < 1) {
           return;
         }
+
+       
+
+          return
                 
         // Use map to return an array of promises
         const ordersPromises = orderIds.map(async (id) => {
@@ -35,7 +39,7 @@ export default async function fetchOrderItems(orderIds = []) {
     
         // console.log("Final Data====", flattenedItems);
         
-        console.log(flattenedItems.length); // Return the final array of order items
+        // console.log(flattenedItems.length); // Return the final array of order items
         return;
   } catch (error) {
     console.error("Error:", error);

@@ -1,0 +1,38 @@
+export const OrderStructure = {
+  currency: "GHS",
+  exchangeRate: 1.0,
+  invoiceNumber: "",
+  totalLevy: 0.00,
+  userName: "",
+  flag: "INVOICE",
+  calculationType: "INCLUSIVE",
+  totalVat: 0.00,
+  transactionDate: "",
+  totalAmount: 0.0,
+  voucherAmount: 0.0,
+  businessPartnerName: "",
+  businessPartnerTin: "C0000000000",
+  saleType: "NORMAL",
+  discountType: "GENERAL",
+  discountAmount: 0.0,
+  reference: "",
+  groupReferenceId: "",
+  purchaseOrderReference: "",
+  items : []
+};
+
+export const OrderItemStructure = {
+  itemCode: "",
+  itemCategory: "",
+  expireDate: "",
+  description: "",
+  quantity: 0,
+  levyAmountA: 0.0,
+  levyAmountB: 0.0,
+  levyAmountC: 0.0,
+  levyAmountD: 0.0,
+  levyAmountE: 0.0,
+  discountAmount: 0.0,
+  batchCode: "",
+  unitPrice: 0.0,
+};

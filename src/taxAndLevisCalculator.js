@@ -1,34 +1,28 @@
-export function calculatePercentage(valuePrice, percentage) {
-  return (valuePrice * percentage) / 100;
-}
-
-function getDecimalPlaces(number) {
-  const decimalPart = number.toString().split(".")[1];
-  return decimalPart ? decimalPart.length : 0;
-}
-
-// Round to match the decimal places of the target value
-export function roundToTargetPrecision(value, target = 0.11) {
-  const decimalPlaces = getDecimalPlaces(target);
-  return parseFloat(value.toFixed(decimalPlaces));
+// Helper function to calculate a percentage with fixed decimal precision
+function calculateRoundedPercentage(value, percentage, precision = 2) {
+  return parseFloat(((value * percentage) / 100).toFixed(precision));
 }
 
 export function calculateAllTaxesAndLeviesForAnItem(item = {}) {
-  const levyAmountA = calculatePercentage(item.pure_sales, 2.5);
-  const levyAmountB = calculatePercentage(item.pure_sales, 2.5);
-  const levyAmountC = calculatePercentage(item.pure_sales, 1);
-  const levyAmountE = calculatePercentage(item.pure_sales, 1);
-  const VAT = calculatePercentage(item.pure_sales, 16);
+  const { pure_sales: pureSales = 0 } = item;
 
-  const allLevies = levyAmountA + levyAmountB + levyAmountC + levyAmountE;
-  const allDues = VAT + allLevies
+  // Calculate levy amounts
+  const levyAmountA = calculateRoundedPercentage(pureSales, 2.5);
+  const levyAmountB = calculateRoundedPercentage(pureSales, 2.5);
+  const levyAmountC = calculateRoundedPercentage(pureSales, 1.0);
+  const levyAmountE = calculateRoundedPercentage(pureSales, 1.0);
+
+  // Calculate total levies and VAT
+  const allLevies = parseFloat((levyAmountA + levyAmountB + levyAmountC + levyAmountE).toFixed(2));
+  const vatPerItem = calculateRoundedPercentage(pureSales + allLevies, 15.0);
 
   return {
-    levyAmountA : roundToTargetPrecision(levyAmountA),
-    levyAmountB: roundToTargetPrecision(levyAmountB),
-    levyAmountC: roundToTargetPrecision(levyAmountC),
-    levyAmountE: roundToTargetPrecision(levyAmountE),
-    VAT,
-    allDues : roundToTargetPrecision(allDues, item.tax_amount),
+    levyAmountA,
+    levyAmountB,
+    levyAmountC,
+    levyAmountE,
+    vatPerItem,
+    allLevies,
+    unitPrice: parseFloat((pureSales + allLevies + vatPerItem).toFixed(2)),
   };
 }

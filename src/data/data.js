@@ -23,7 +23,7 @@ export const OrderStructure = {
 
 export const OrderItemStructure = {
   itemCode: "",
-  itemCategory: "",
+  itemCategory: "TRSM",
   expireDate: "",
   description: "",
   quantity: 0,

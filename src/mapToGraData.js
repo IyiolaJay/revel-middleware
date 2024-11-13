@@ -1,5 +1,5 @@
-import { OrderItemStructure, OrderStructure } from "./data/data.js";
-import { calculateAllTaxesAndLeviesForAnItem, roundToTargetPrecision } from "./taxAndLevisCalculator.js";
+import { OrderItemStructure } from "./data/data.js";
+import { calculateAllTaxesAndLeviesForAnItem } from "./taxAndLevisCalculator.js";
 
 export function CalculateAndMapValues (orderItems = []){
     if (orderItems.length < 1) return {
@@ -16,29 +16,29 @@ export function CalculateAndMapValues (orderItems = []){
     
     //
     const calculateValues = orderItems.map(item => {
-        const levies = calculateAllTaxesAndLeviesForAnItem(item);
+        const dues = calculateAllTaxesAndLeviesForAnItem(item);
         
         //get total levy
-        totalLevy = totalLevy + levies.allDues
+        totalLevy += (dues.allLevies * item.quantity)
         
         //get total tax
-        totalVat = totalVat + levies.VAT;
+        totalVat = totalVat + (dues.vatPerItem * item.quantity);
 
         //
-        totalAmount = totalAmount + item.pure_sales;
+        totalAmount = totalAmount + (dues.unitPrice * item.quantity);
         
         userName = item.created_by.split("/")[3] ?? "";
-
+        
         return {
             ...OrderItemStructure,
-            itemCode : item.uuid,
-            levyAmountA : levies.levyAmountA,
-            levyAmountB : levies.levyAmountB,
-            levyAmountC : levies.levyAmountC,
-            levyAmountE : levies.levyAmountE,
+            itemCode : item.uuid + "221",
+            levyAmountA : dues.levyAmountA * item.quantity,
+            levyAmountB : dues.levyAmountB * item.quantity,
+            levyAmountC : dues.levyAmountC * item.quantity,
+            levyAmountE : dues.levyAmountE * item.quantity,
             description : item.product_name_override,
             quantity : item.quantity,
-            unitPrice : item.pure_sales,
+            unitPrice : dues.unitPrice,
         };
     })
 
@@ -49,9 +49,9 @@ export function CalculateAndMapValues (orderItems = []){
     // });
 
     return {
-        totalAmount : totalAmount.toFixed(1),
-        totalLevy : totalLevy.toFixed(2),
-        totalVat : totalVat.toFixed(1),
+        totalAmount : parseFloat(totalAmount.toFixed(2)),
+        totalLevy : totalLevy,
+        totalVat : totalVat,
         userName : `${process.env.ENTERPRISE_ACRONYM}${process.env.STATION_ID}-${userName}`,
         items : calculateValues
     }

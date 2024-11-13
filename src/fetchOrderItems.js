@@ -1,6 +1,7 @@
 import axios from "axios";
-import { CalculateAndMapValues } from "./mapData.js";
+import { CalculateAndMapValues } from "./mapToGraData.js";
 import { OrderStructure } from "./data/data.js";
+import SendOrdersToGRA from "./sendOrders.js";
 
 // Create the authentication string by joining key and secret
 const apiAuth = `${process.env.APIKEY}:${process.env.APISECRET}`;
@@ -15,9 +16,6 @@ export default async function fetchOrderItems(orderIds = []) {
           return;
         }
 
-       
-
-      
                 
         // Use map to return an array of promises
         const ordersPromises = orderIds.map(async (id) => {
@@ -34,8 +32,9 @@ export default async function fetchOrderItems(orderIds = []) {
           // CalculateAndMapValues(response.data.objects ?? []);
           let mappedValues = [];
           if(response.data.objects.length > 0){
-           const  data =  CalculateAndMapValues(response.data.objects);
-            // const userIdentifier = id.
+           //
+            const  data =  CalculateAndMapValues(response.data.objects);
+
             mappedValues = {
               ...OrderStructure,
               invoiceNumber: `${process.env.ENTERPRISE_ACRONYM}${process.env.STATION_ID}-${id.id}`,
@@ -44,6 +43,7 @@ export default async function fetchOrderItems(orderIds = []) {
               transactionDate : id.created_date,
               totalAmount : data.totalAmount,
               totalLevy : data.totalLevy,
+              totalVat : data.totalVat,
               items : data.items
             
             }
@@ -57,9 +57,12 @@ export default async function fetchOrderItems(orderIds = []) {
         // Flatten the array if needed
         const flattenedItems = allOrderItems.flat();
     
-        console.log("Final Data=", flattenedItems);
+        console.log("Final Data=", flattenedItems.length);
         
-        // console.log(flattenedItems.length); // Return the final array of order items
+        if (flattenedItems.length > 0 ){
+          await SendOrdersToGRA(flattenedItems);
+        }
+
         return;
   } catch (error) {
     console.error("Error:", error);

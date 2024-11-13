@@ -10,20 +10,21 @@ const BASE_URL = process.env.BASE_URL;
 // Function to make the request
 export default async function fetchNewOrders() {
   try {
+    // console.log("Running");
     let processedIds = (await getCacheData("savedOrderId")) ?? [];
 
     if (processedIds.length > 0) processedIds = JSON.parse(processedIds);
 
     const currentTime = new Date(Date.now()).toISOString();
     const twoMinutesAgo = new Date(
-      new Date().getTime() - 300 * 60 * 1000
+      new Date().getTime() - 120 * 1000
     ).toISOString();
 
     // console.log("From", twoMinutesAgo);
     // console.log("To", currentTime);
 
     const establishmentId = process.env.ESTABLISHMENT_ID;
-    const URL = `${BASE_URL}/resources/Order/?&limit=500&establishmentId=${establishmentId}&created_date__range=${twoMinutesAgo},${currentTime}`;
+    const URL = `${BASE_URL}/resources/Order/?&establishmentId=${establishmentId}&created_date__range=${twoMinutesAgo},${currentTime}`;
 
     const response = await axios.get(URL, {
       headers: {
@@ -36,8 +37,14 @@ export default async function fetchNewOrders() {
 
     // filter for only specified PosStation id
     let polledIds = response.data?.objects.filter(
-      (item) => item.created_at !== "/resources/PosStation/516/"
+      (item) => item.created_at === `/resources/PosStation/${process.env.STATION_ID}/`
     );
+
+    if(polledIds.length > 1){await cacheData({
+      key: "multipleItemFetch",
+      value: JSON.stringify(polledIds.map((order) => ({id : order.id, timeStamp: new Date(Date.now()).toISOString() }))),
+    });
+    } 
 
     // console.log(response.data?.objects)
     // Maps only ids of the orders

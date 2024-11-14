@@ -13,6 +13,7 @@ const BASE_URL = process.env.BASE_URL;
 export default async function fetchOrderItems(orderIds = []) {
     try {
         if (orderIds.length < 1) {
+          console.log("Empty orders");
           return;
         }
 
@@ -27,7 +28,7 @@ export default async function fetchOrderItems(orderIds = []) {
             },
           });
           
-          // console.log("orderitems: ",id, " - ", response.data.objects.length )
+          console.log("orderitems: ",id, " - ", response.data.objects.length )
 
           // CalculateAndMapValues(response.data.objects ?? []);
           let mappedValues = [];

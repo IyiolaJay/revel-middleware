@@ -11,4 +11,4 @@ await connectToDB();
 
 // Run the fetchOrderData function every 30 seconds
 // setInterval(fetchOrderData, 30000);
-setInterval(async () => await fetchNewOrders(), 15000);
+setInterval(async () => await fetchNewOrders(), 30000);

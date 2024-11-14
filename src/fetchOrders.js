@@ -20,11 +20,9 @@ export default async function fetchNewOrders() {
       new Date().getTime() - 120 * 1000
     ).toISOString();
 
-    // console.log("From", twoMinutesAgo);
-    // console.log("To", currentTime);
 
     const establishmentId = process.env.ESTABLISHMENT_ID;
-    const URL = `${BASE_URL}/resources/Order/?&establishmentId=${establishmentId}&created_date__range=${twoMinutesAgo},${currentTime}`;
+    const URL = `${BASE_URL}/resources/Order/?&limit=500&establishmentId=${establishmentId}&created_date__range=${twoMinutesAgo},${currentTime}`;
 
     const response = await axios.get(URL, {
       headers: {
@@ -33,24 +31,18 @@ export default async function fetchNewOrders() {
       },
     });
     
-
+    console.log("Lenght of all orders fetch", response.data?.objects.length);
+    
 
     // filter for only specified PosStation id
     let polledIds = response.data?.objects.filter(
       (item) => item.created_at === `/resources/PosStation/${process.env.STATION_ID}/`
     );
 
-    if(polledIds.length > 1){await cacheData({
-      key: "multipleItemFetch",
-      value: JSON.stringify(polledIds.map((order) => ({id : order.id, timeStamp: new Date(Date.now()).toISOString() }))),
-    });
-    } 
-
-    // console.log(response.data?.objects)
     // Maps only ids of the orders
-     polledIds = polledIds.map((order) => ({id : order.id, created_date : order.created_date}));
+    polledIds = polledIds.map((order) => ({id : order.id, created_date : order.created_date}));
 
-    if (processedIds.length < 1) {
+    if (processedIds.length < 1 && polledIds.length > 0) {
       await fetchOrderItems(polledIds);
       /**
        * cache the ids of orders fetched
@@ -59,7 +51,7 @@ export default async function fetchNewOrders() {
         key: "savedOrderId",
         value: JSON.stringify(polledIds.map((order) => order.id)),
       });
-    } else {
+    } else if(processedIds.length > 0 && polledIds.length > 0) {
       /**
        * Remove previously fetch & processed Order Id from the new order poll
        */
@@ -68,14 +60,19 @@ export default async function fetchNewOrders() {
       );
 
       if (filteredIds < 1) return;
+      // else console.log(filteredIds)
       /**
        * cache the ids of orders fetched
        */
+      processedIds.push(...polledIds.map((order) => order.id))
        await cacheData({
         key: "savedOrderId",
-        value: JSON.stringify(polledIds.map((order) => order.id)),
+        value: JSON.stringify(processedIds),
       });
       await fetchOrderItems(filteredIds);
+    }else{
+      console.log("No orders to process");
+      return;
     }
 
     return;

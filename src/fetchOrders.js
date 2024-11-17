@@ -22,7 +22,7 @@ export default async function fetchNewOrders() {
 
 
     const establishmentId = process.env.ESTABLISHMENT_ID;
-    const URL = `${BASE_URL}/resources/Order/?&limit=500&establishmentId=${establishmentId}&created_date__range=${twoMinutesAgo},${currentTime}`;
+    const URL = `${BASE_URL}/resources/Order/?&establishment=${establishmentId}&created_date__range=${twoMinutesAgo},${currentTime}&closed=true`;
 
     const response = await axios.get(URL, {
       headers: {
@@ -31,16 +31,13 @@ export default async function fetchNewOrders() {
       },
     });
     
-    console.log("Lenght of all orders fetch", response.data?.objects.length);
+    console.log("Lenght of all orders fetched", response.data.objects.length);
     
 
-    // filter for only specified PosStation id
-    let polledIds = response.data?.objects.filter(
-      (item) => item.created_at === `/resources/PosStation/${process.env.STATION_ID}/`
-    );
+  
 
     // Maps only ids of the orders
-    polledIds = polledIds.map((order) => ({id : order.id, created_date : order.created_date}));
+    const polledIds = response.data.objects.map((order) => ({id : order.id, created_date : order.created_date}));
 
     if (processedIds.length < 1 && polledIds.length > 0) {
       await fetchOrderItems(polledIds);
@@ -71,7 +68,7 @@ export default async function fetchNewOrders() {
       });
       await fetchOrderItems(filteredIds);
     }else{
-      console.log("No orders to process");
+      // console.log("No orders to process");
       return;
     }
 

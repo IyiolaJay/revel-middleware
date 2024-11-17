@@ -28,8 +28,6 @@ export default async function fetchOrderItems(orderIds = []) {
             },
           });
           
-          console.log("orderitems: ",id, " - ", response.data.objects.length )
-
           // CalculateAndMapValues(response.data.objects ?? []);
           let mappedValues = [];
           if(response.data.objects.length > 0){
@@ -58,7 +56,7 @@ export default async function fetchOrderItems(orderIds = []) {
         // Flatten the array if needed
         const flattenedItems = allOrderItems.flat();
     
-        console.log("Final Data=", flattenedItems.length);
+        // console.log("Final Data=", flattenedItems.length);
         
         if (flattenedItems.length > 0 ){
           await SendOrdersToGRA(flattenedItems);

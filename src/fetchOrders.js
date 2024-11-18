@@ -29,10 +29,7 @@ export default async function fetchNewOrders() {
         "API-AUTHENTICATION": apiAuth,
         "Content-Type": "application/json",
       },
-    });
-    
-    console.log("Lenght of all orders fetched", response.data.objects.length);
-    
+    });    
 
   
 

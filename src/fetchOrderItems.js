@@ -36,9 +36,9 @@ export default async function fetchOrderItems(orderIds = []) {
 
             mappedValues = {
               ...OrderStructure,
-              invoiceNumber: `${process.env.ENTERPRISE_ACRONYM}${process.env.STATION_ID}-${id.id}`,
+              invoiceNumber: `${process.env.ENTERPRISE_ACRONYM}${process.env.ESTABLISHMENT_ID}-${id.id}`,
               userName : data.userName,
-              businessPartnerName : `${process.env.ENTERPRISE_ACRONYM}${process.env.STATION_ID}-CUSTOMER`,
+              businessPartnerName : `${process.env.ENTERPRISE_ACRONYM}${process.env.ESTABLISHMENT_ID}-CUSTOMER`,
               transactionDate : id.created_date,
               totalAmount : data.totalAmount,
               totalLevy : data.totalLevy,

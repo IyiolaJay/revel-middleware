@@ -24,8 +24,12 @@ export default async function SendOrdersToGRA(mappedOrders = []) {
 
     //
     return {
-            ...response.data,
-            invoiceNumber : order.invoiceNumber,
+            // ...response.data,
+            // invoiceNumber : order.invoiceNumber,
+            orderItems : order,
+            orderReceipt : {
+              ...response.data
+            }
             };
   });
 

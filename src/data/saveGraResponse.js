@@ -1,22 +1,33 @@
-import OrderReceipt from "./model/orderReceipt.js";
+import axios from "axios";
 
-export default async function saveOrderReceiptToDb(receiptData){
-    try{
-        
-        const _receiptMapped = receiptData.map(receipt => new OrderReceipt({
-            invoiceNumber : receipt.invoiceNumber,
-            distributor_tin : receipt.response.distributor_tin,
-            message : receipt.response.message,
-            qr_code : receipt.response.qr_code
-        }))
+export default async function saveOrderReceiptToDb(receiptData) {
+  try {
+    const _receiptMapped = receiptData.map(
+      (receipt) =>
+        ({
+          orderItems: receipt.orderItems,
+          orderReceipt: {
+            distributor_tin: receipt.orderReceipt.response.distributor_tin,
+            message: receipt.orderReceipt.response.message,
+            qr_code: receipt.orderReceipt.response.qr_code,
+          },
+        })
+    );
 
-        //
-        // return;
-        await OrderReceipt.bulkSave(_receiptMapped);
-        
-        console.log("Saved to Db");
-        return;
-    }catch(error){
-        console.log(error);
-    }
+     axios.put(
+      process.env.MAIN_SERVER_URL ?? "",
+      {
+        items: _receiptMapped
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return;
+  } catch (error) {
+    console.log(error);
+  }
 }

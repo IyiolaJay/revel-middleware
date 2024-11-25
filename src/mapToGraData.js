@@ -12,7 +12,7 @@ export function CalculateAndMapValues (orderItems = []){
     let totalVat = 0;
     let totalLevy = 0;
     let totalAmount = 0;
-    let userName;
+    let userId;
     
     //
     const calculateValues = orderItems.map(item => {
@@ -27,7 +27,7 @@ export function CalculateAndMapValues (orderItems = []){
         //
         totalAmount = totalAmount + (dues.unitPrice * item.quantity);
         
-        userName = item.created_by.split("/")[3] ?? "";
+        userId = item.created_by.split("/")[3] ?? "";
         
         return {
             ...OrderItemStructure,
@@ -52,7 +52,7 @@ export function CalculateAndMapValues (orderItems = []){
         totalAmount : parseFloat(totalAmount.toFixed(2)),
         totalLevy : totalLevy,
         totalVat : totalVat,
-        userName : `${process.env.ENTERPRISE_ACRONYM}${process.env.STATION_ID}-${userName}`,
+        userId : userId,
         items : calculateValues
     }
 }

@@ -5,6 +5,7 @@ export default async function saveOrderReceiptToDb(receiptData) {
     const _receiptMapped = receiptData.map(
       (receipt) =>
         ({
+          establishmentId : Number(process.env.ESTABLISHMENT_ID),
           orderItems: receipt.orderItems,
           orderReceipt: {
             distributor_tin: receipt.orderReceipt.response.distributor_tin,

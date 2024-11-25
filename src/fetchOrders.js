@@ -16,13 +16,13 @@ export default async function fetchNewOrders() {
     if (processedIds.length > 0) processedIds = JSON.parse(processedIds);
 
     const currentTime = new Date(Date.now()).toISOString();
-    const twoMinutesAgo = new Date(
-      new Date().getTime() - 120 * 1000
+    const twoHoursAgo = new Date(
+      new Date().getTime() - 2 * 60 * 60 * 1000 // 2 hours in milliseconds
     ).toISOString();
 
 
     const establishmentId = process.env.ESTABLISHMENT_ID;
-    const URL = `${BASE_URL}/resources/Order/?&establishment=${establishmentId}&created_date__range=${twoMinutesAgo},${currentTime}&closed=true`;
+    const URL = `${BASE_URL}/resources/Order/?&establishment=${establishmentId}&created_date__range=${twoHoursAgo},${currentTime}&closed=true`;
 
     const response = await axios.get(URL, {
       headers: {

@@ -33,12 +33,23 @@ export default async function fetchOrderItems(orderIds = []) {
           if(response.data.objects.length > 0){
            //
             const  data =  CalculateAndMapValues(response.data.objects);
+           
+            const userURL = `${BASE_URL}/enterprise/User/${data.userId}`;
+            
+            //call for user details
+            const userResponse = await axios.get(userURL, {
+              headers: {
+                "API-AUTHENTICATION": apiAuth,
+                "Content-Type": "application/json",
+              },
+            });
+
 
             mappedValues = {
               ...OrderStructure,
               invoiceNumber: `${process.env.ENTERPRISE_ACRONYM}${process.env.ESTABLISHMENT_ID}-${id.id}`,
-              userName : data.userName,
-              businessPartnerName : `${process.env.ENTERPRISE_ACRONYM}${process.env.ESTABLISHMENT_ID}-CUSTOMER`,
+              userName : `${userResponse.data.first_name} ${userResponse.data.last_name}`,
+              businessPartnerName : `CUSTOMER-${id.id}`,
               transactionDate : id.created_date,
               totalAmount : data.totalAmount,
               totalLevy : data.totalLevy,

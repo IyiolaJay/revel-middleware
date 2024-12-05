@@ -10,7 +10,7 @@ const BASE_URL = process.env.BASE_URL;
 
 
 // Function to make the request
-export default async function fetchOrderItems(orderIds = []) {
+export default async function fetchOrderItems(orderIds = [], establishment) {
     try {
         if (orderIds.length < 1) {
           console.log("Empty orders");
@@ -20,7 +20,7 @@ export default async function fetchOrderItems(orderIds = []) {
                 
         // Use map to return an array of promises
         const ordersPromises = orderIds.map(async (id) => {
-          const URL = `${BASE_URL}/resources/OrderItem/?order=${id.id}`;
+          const URL = `${establishment.estUrl}/resources/OrderItem/?order=${id.id}`;
           const response = await axios.get(URL, {
             headers: {
               "API-AUTHENTICATION": apiAuth,
@@ -34,7 +34,7 @@ export default async function fetchOrderItems(orderIds = []) {
            //
             const  data =  CalculateAndMapValues(response.data.objects);
            
-            const userURL = `${BASE_URL}/enterprise/User/${data.userId}`;
+            const userURL = `${establishment.estUrl}/enterprise/User/${data.userId}`;
             
             //call for user details
             const userResponse = await axios.get(userURL, {
@@ -47,7 +47,7 @@ export default async function fetchOrderItems(orderIds = []) {
 
             mappedValues = {
               ...OrderStructure,
-              invoiceNumber: `${process.env.ENTERPRISE_ACRONYM}${process.env.ESTABLISHMENT_ID}-${id.id}`,
+              invoiceNumber: `${process.env.ENTERPRISE_ACRONYM}${establishment.estId}-${id.id}`,
               userName : `${userResponse.data.first_name} ${userResponse.data.last_name}`,
               businessPartnerName : `CUSTOMER-${id.id}`,
               transactionDate : id.created_date,

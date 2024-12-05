@@ -8,7 +8,7 @@ const apiAuth = `${process.env.APIKEY}:${process.env.APISECRET}`;
 const BASE_URL = process.env.BASE_URL;
 
 // Function to make the request
-export default async function fetchNewOrders() {
+export default async function fetchNewOrders(establishment) {
   try {
     // console.log("Running");
     let processedIds = (await getCacheData("savedOrderId")) ?? [];
@@ -21,8 +21,8 @@ export default async function fetchNewOrders() {
     ).toISOString();
 
 
-    const establishmentId = process.env.ESTABLISHMENT_ID;
-    const URL = `${BASE_URL}/resources/Order/?&establishment=${establishmentId}&created_date__range=${twoHoursAgo},${currentTime}&closed=true`;
+    // const establishmentId = process.env.ESTABLISHMENT_ID;
+    const URL = `${establishment.estUrl}/resources/Order/?&establishment=${establishment.estId}&created_date__range=${twoHoursAgo},${currentTime}&closed=true`;
 
     const response = await axios.get(URL, {
       headers: {
@@ -37,7 +37,7 @@ export default async function fetchNewOrders() {
     const polledIds = response.data.objects.map((order) => ({id : order.id, created_date : order.created_date}));
 
     if (processedIds.length < 1 && polledIds.length > 0) {
-      await fetchOrderItems(polledIds);
+      await fetchOrderItems(polledIds, establishment);
       /**
        * cache the ids of orders fetched
        */
@@ -63,7 +63,7 @@ export default async function fetchNewOrders() {
         key: "savedOrderId",
         value: JSON.stringify(processedIds),
       });
-      await fetchOrderItems(filteredIds);
+      await fetchOrderItems(filteredIds, establishment);
     }else{
       // console.log("No orders to process");
       return;

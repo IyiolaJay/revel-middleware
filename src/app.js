@@ -1,6 +1,7 @@
 import "dotenv/config";
 import fetchNewOrders from "./fetchOrders.js";
 import { setUpRedisClient } from "./redis/redis.js";
+import { getCacheData } from "./redis/redis.cache.js";
 
 
 await setUpRedisClient();
@@ -11,8 +12,16 @@ setInterval(
     async () => {
         const timeNow = new Date().getUTCHours();
         
-        if (timeNow >= Number(process.env.OPEN_HOURS) && timeNow <= Number(process.env.CLOSE_HOURS)){
-            await fetchNewOrders()
+        if (timeNow >= Number(process.env.OPEN_HOURS) || timeNow <= Number(process.env.CLOSE_HOURS)){
+            let activeEstCache = (await getCacheData("acs_01")) ?? [];
+            
+            if (activeEstCache.length > 0) activeEstCache = JSON.parse(activeEstCache);
+            else return;
+
+            activeEstCache.forEach(async (establishment) => {
+                await fetchNewOrders(establishment)
+            });
+            // await fetchNewOrders()
         }else{
             console.log("Out of execution hours")
             return;

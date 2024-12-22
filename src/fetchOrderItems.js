@@ -70,7 +70,7 @@ export default async function fetchOrderItems(orderIds = [], establishment) {
         // console.log("Final Data=", flattenedItems.length);
         
         if (flattenedItems.length > 0 ){
-          await SendOrdersToGRA(flattenedItems);
+          await SendOrdersToGRA(flattenedItems,establishment.estId);
         }
 
         return;

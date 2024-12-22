@@ -18,8 +18,8 @@ setInterval(
             if (activeEstCache.length > 0) activeEstCache = JSON.parse(activeEstCache);
             else return;
 
-            activeEstCache.forEach(async (establishment) => {
-                await fetchNewOrders(establishment)
+            activeEstCache.forEach((establishment) => {
+                 fetchNewOrders(establishment)
             });
             // await fetchNewOrders()
         }else{

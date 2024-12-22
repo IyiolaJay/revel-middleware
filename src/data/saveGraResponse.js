@@ -1,11 +1,11 @@
 import axios from "axios";
 
-export default async function saveOrderReceiptToDb(receiptData) {
+export default async function saveOrderReceiptToDb(receiptData, establishmentId) {
   try {
     const _receiptMapped = receiptData.map(
       (receipt) =>
         ({
-          establishmentId : Number(process.env.ESTABLISHMENT_ID),
+          establishmentId : Number(establishmentId),
           orderItems: receipt.orderItems,
           orderReceipt: {
             distributor_tin: receipt.orderReceipt.response.distributor_tin,

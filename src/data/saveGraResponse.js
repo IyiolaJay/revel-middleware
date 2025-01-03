@@ -2,7 +2,7 @@ import axios from "axios";
 
 export default async function saveOrderReceiptToDb(receiptData, establishmentId) {
   try {
-    const _receiptMapped = receiptData.map(.env
+    const _receiptMapped = receiptData.map(
       (receipt) =>
         ({
           establishmentId : Number(establishmentId),

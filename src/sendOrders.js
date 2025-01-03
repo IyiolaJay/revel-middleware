@@ -1,7 +1,7 @@
 import axios from "axios";
 import saveOrderReceiptToDb from "./data/saveGraResponse.js";
 
-export default async function SendOrdersToGRA(mappedOrders = []) {
+export default async function SendOrdersToGRA(mappedOrders = [], establishmentId) {
   if (mappedOrders.length < 1) return;
  
   /**
@@ -36,6 +36,6 @@ export default async function SendOrdersToGRA(mappedOrders = []) {
 
   const _receipts = await Promise.all(receipts);
   //save order receipts to order table in db
-  saveOrderReceiptToDb(_receipts);
+  saveOrderReceiptToDb(_receipts, establishmentId);
   return;
 }
